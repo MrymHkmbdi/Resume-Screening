@@ -19,13 +19,14 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.multiclass import OneVsRestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 resumes = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/resume/UpdatedResumeDataSet.csv', encoding='utf-8')
 resumes['cleaned_resume'] = ''
 
 resumes.head()
 
-import re
 def cleanResume(resumeText):
     resumeText = re.sub('http\S+\s*', ' ', resumeText)  # remove URLs
     resumeText = re.sub('RT|cc', ' ', resumeText)  # remove RT and cc
@@ -38,10 +39,6 @@ def cleanResume(resumeText):
     
 resumes['cleaned_resume'] = resumes.Resume.apply(lambda x: cleanResume(x))
 
-resumes.head()
-
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 text = resumes['cleaned_resume'].values
 target = resumes['Category'].values
@@ -52,5 +49,4 @@ X_train, X_test, y_train, y_test = train_test_split(word_vec, target, random_sta
 
 classifier = OneVsRestClassifier(KNeighborsClassifier()).fit(X_train, y_train)
 prediction = classifier.predict(X_test)
-print('Accuracy of KNeighbors Classifier on training set: {:.2f}'.format(classifier.score(X_train, y_train)))
-print('Accuracy of KNeighbors Classifier on test set: {:.2f}'.format(classifier.score(X_test, y_test)))
+print('Accuracy: {:.2f}'.format(classifier.score(X_test, y_test)))
